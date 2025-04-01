@@ -23,16 +23,20 @@
         }
         #buttons {
             display: flex;
-            gap: 20px;
+            gap: 40px;
             position: relative;
+            z-index: 2;
         }
         button {
             font-size: 20px;
             padding: 10px 20px;
             cursor: pointer;
+            position: relative;
         }
         #yes {
             position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
         }
         #video-container {
             display: none;
@@ -45,17 +49,12 @@
             align-items: center;
             justify-content: center;
             flex-direction: column;
+            z-index: 10;
         }
         video {
             width: 100vw;
             height: 100vh;
             object-fit: cover;
-        }
-        #back-button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 20px;
-            cursor: pointer;
         }
     </style>
 </head>
@@ -82,7 +81,7 @@
         const backButton = document.getElementById("back-button");
         let isYesEnabled = false;
         const escapeTime = 10000;
-        
+
         function isOverlapping(el1, el2) {
             const rect1 = el1.getBoundingClientRect();
             const rect2 = el2.getBoundingClientRect();
@@ -99,8 +98,8 @@
                 let offsetX, offsetY;
                 let maxAttempts = 10;
                 do {
-                    offsetX = (Math.random() - 0.5) * 400;
-                    offsetY = (Math.random() - 0.5) * 200;
+                    offsetX = (Math.random() - 0.5) * 250;
+                    offsetY = (Math.random() - 0.5) * 150;
                     yesButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
                     maxAttempts--;
                 } while (
@@ -121,7 +120,14 @@
             }
         });
 
-        yesButton.addEventListener("touchstart", () => {
+        yesButton.addEventListener("mousemove", () => {
+            if (!isYesEnabled) {
+                requestAnimationFrame(moveYesButton);
+            }
+        });
+
+        yesButton.addEventListener("touchstart", (e) => {
+            e.stopPropagation();
             if (!isYesEnabled) {
                 moveYesButton();
             }

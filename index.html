@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,18 +14,14 @@
             justify-content: center;
             height: 100vh;
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
         }
         #question {
             font-size: 24px;
             margin-bottom: 20px;
-            text-align: center;
         }
         #buttons {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 40px; /* Делаем небольшой отступ между кнопками */
+            gap: 50px;
         }
         button {
             font-size: 20px;
@@ -34,7 +30,6 @@
         }
         #yes {
             position: relative;
-            transition: transform 0.2s ease;
         }
         #video-container {
             display: none;
@@ -47,7 +42,6 @@
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            z-index: 10;
         }
         video {
             width: 100vw;
@@ -69,7 +63,6 @@
         </video>
         <button id="back-button">Назад</button>
     </div>
-    
     <script>
         const yesButton = document.getElementById("yes");
         const noButton = document.getElementById("no");
@@ -77,41 +70,58 @@
         const video = document.getElementById("video");
         const backButton = document.getElementById("back-button");
         let isYesEnabled = false;
+        let escapeTime = 10000;
+        let startTime = Date.now();
+
+        function isOverlapping(el1, el2) {
+            const rect1 = el1.getBoundingClientRect();
+            const rect2 = el2.getBoundingClientRect();
+            return !(
+                rect1.right < rect2.left ||
+                rect1.left > rect2.right ||
+                rect1.bottom < rect2.top ||
+                rect1.top > rect2.bottom
+            );
+        }
 
         function moveYesButton() {
             if (!isYesEnabled) {
-                let offsetX = (Math.random() - 0.5) * 100; // Смещение ближе к кнопке "Нет"
-                let offsetY = (Math.random() - 0.5) * 50;
-                yesButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+                let offsetX, offsetY;
+                let maxAttempts = 10;
+                do {
+                    offsetX = (Math.random() - 0.5) * 100; // Уменьшил диапазон смещения
+                    offsetY = (Math.random() - 0.5) * 50;
+                    yesButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+                    maxAttempts--;
+                } while (
+                    (isOverlapping(yesButton, noButton) || isOverlapping(yesButton, document.getElementById("question"))) &&
+                    maxAttempts > 0
+                );
             }
         }
 
         yesButton.addEventListener("mouseover", () => {
             if (!isYesEnabled) {
-                moveYesButton();
+                requestAnimationFrame(moveYesButton);
             }
         });
 
-        yesButton.addEventListener("touchstart", (e) => {
-            e.stopPropagation();
-            if (!isYesEnabled) {
-                moveYesButton();
+        const escapeInterval = setInterval(() => {
+            if (Date.now() - startTime >= escapeTime) {
+                clearInterval(escapeInterval);
+                isYesEnabled = true;
+                yesButton.style.pointerEvents = "auto";
+                yesButton.style.transform = "translate(0, 0)";
             }
-        });
+        }, 200);
 
-        setTimeout(() => {
-            yesButton.style.transform = "translate(0, 0)";
-            isYesEnabled = true;
-        }, 10000);
-
-        yesButton.addEventListener("click", (e) => {
-            e.stopPropagation();
-            document.body.innerHTML = '<h1>Я тебя тоже</h1><button onclick="location.reload()">Посмотри что было бы, нажми ты "Нет"</button>';
+        yesButton.addEventListener("click", () => {
+            document.body.innerHTML = '<h1>Я тебя тоже</h1><button onclick="location.reload()">Посмотри что было бы нажми ты нет</button>';
         });
 
         noButton.addEventListener("click", () => {
             videoContainer.style.display = "flex";
-            video.muted = false;
+            video.currentTime = 0; // Перематываем на начало
             video.play();
         });
 

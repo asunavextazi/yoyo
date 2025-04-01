@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Уворачивающаяся мышка</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        #cursor {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            border-radius: 50%;
+            pointer-events: none;
+            transition: transform 0.1s ease-out;
+        }
+        #question {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        #buttons {
+            display: flex;
+            gap: 20px;
+        }
+        button {
+            font-size: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        #yes {
+            position: relative;
+        }
+        #video-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: black;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        video {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+        }
+        #back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="question">Ты меня любишь?</div>
+    <div id="buttons">
+        <button id="yes">Да</button>
+        <button id="no">Нет</button>
+    </div>
+    <div id="video-container">
+        <video id="video" controls autoplay>
+            <source id="video-source" src="" type="video/mp4">
+            Ваш браузер не поддерживает видео.
+        </video>
+        <button id="back-button">Назад</button>
+    </div>
+    <script>
+        const yesButton = document.getElementById("yes");
+        const noButton = document.getElementById("no");
+        const videoContainer = document.getElementById("video-container");
+        const video = document.getElementById("video");
+        const videoSource = document.getElementById("video-source");
+        const backButton = document.getElementById("back-button");
+        let isYesEnabled = false;
+        let escapeTime = 10000;
+        let startTime = Date.now();
+        
+        function moveYesButton() {
+            if (!isYesEnabled) {
+                const offsetX = (Math.random() - 0.5) * 400;
+                const offsetY = (Math.random() - 0.5) * 200;
+                yesButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+            }
+        }
+        
+        yesButton.addEventListener("mouseover", () => {
+            if (!isYesEnabled) {
+                moveYesButton();
+            }
+        });
+        
+        const escapeInterval = setInterval(() => {
+            if (Date.now() - startTime >= escapeTime) {
+                clearInterval(escapeInterval);
+                isYesEnabled = true;
+                yesButton.style.pointerEvents = "auto";
+                yesButton.style.transform = "translate(0, 0)";
+            }
+        }, 200);
+        
+        yesButton.addEventListener("click", () => {
+            document.body.innerHTML = '<h1>Я тебя тоже</h1><button onclick="location.reload()">Посмотри что было бы нажми ты нет</button>';
+        });
+
+        noButton.addEventListener("click", () => {
+            videoSource.src = "https://kappa.lol/CrRya";
+            video.load();
+            videoContainer.style.display = "flex";
+            video.play();
+        });
+        
+        backButton.addEventListener("click", () => {
+            video.pause();
+            videoContainer.style.display = "none";
+        });
+    </script>
+</body>
+</html>

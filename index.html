@@ -23,7 +23,9 @@
         }
         #buttons {
             display: flex;
-            gap: 40px;
+            justify-content: space-between;
+            width: 80vw; /* Увеличил ширину блока кнопок */
+            max-width: 500px;
             position: relative;
             z-index: 2;
         }
@@ -31,12 +33,14 @@
             font-size: 20px;
             padding: 10px 20px;
             cursor: pointer;
-            position: relative;
         }
         #yes {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
+            position: relative;
+            left: -30px; /* Немного левее */
+        }
+        #no {
+            position: relative;
+            right: -30px; /* Немного правее */
         }
         #video-container {
             display: none;
@@ -115,12 +119,6 @@
         }
 
         yesButton.addEventListener("mouseover", () => {
-            if (!isYesEnabled) {
-                requestAnimationFrame(moveYesButton);
-            }
-        });
-
-        yesButton.addEventListener("mousemove", () => {
             if (!isYesEnabled) {
                 requestAnimationFrame(moveYesButton);
             }

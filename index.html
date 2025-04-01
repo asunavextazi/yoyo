@@ -116,12 +116,13 @@
             document.body.innerHTML = '<h1>Я тебя тоже</h1><button onclick="location.reload()">Посмотри что было бы нажми ты нет</button>';
         });
 
-        noButton.addEventListener("click", () => {
-            videoSource.src = "https://kappa.lol/CrRya";
-            video.load();
-            videoContainer.style.display = "flex";
-            video.play();
-        });
+    noButton.addEventListener("click", () => {
+    videoSource.src = "https://raw.githubusercontent.com/asunavextazi/yoyo/main/video/new_sound.mp4?t=" + new Date().getTime();
+    video.load();
+    videoContainer.style.display = "flex";
+    video.play();
+});
+
         
         backButton.addEventListener("click", () => {
             video.pause();

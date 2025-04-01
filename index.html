@@ -23,11 +23,9 @@
         }
         #buttons {
             display: flex;
-            justify-content: space-between;
-            width: 80vw; /* Увеличил ширину блока кнопок */
-            max-width: 500px;
-            position: relative;
-            z-index: 2;
+            justify-content: center;
+            align-items: center;
+            gap: 40px; /* Делаем небольшой отступ между кнопками */
         }
         button {
             font-size: 20px;
@@ -36,11 +34,7 @@
         }
         #yes {
             position: relative;
-            left: -30px; /* Немного левее */
-        }
-        #no {
-            position: relative;
-            right: -30px; /* Немного правее */
+            transition: transform 0.2s ease;
         }
         #video-container {
             display: none;
@@ -79,48 +73,22 @@
     <script>
         const yesButton = document.getElementById("yes");
         const noButton = document.getElementById("no");
-        const question = document.getElementById("question");
         const videoContainer = document.getElementById("video-container");
         const video = document.getElementById("video");
         const backButton = document.getElementById("back-button");
         let isYesEnabled = false;
-        const escapeTime = 10000;
-
-        function isOverlapping(el1, el2) {
-            const rect1 = el1.getBoundingClientRect();
-            const rect2 = el2.getBoundingClientRect();
-            return !(
-                rect1.right < rect2.left ||
-                rect1.left > rect2.right ||
-                rect1.bottom < rect2.top ||
-                rect1.top > rect2.bottom
-            );
-        }
 
         function moveYesButton() {
             if (!isYesEnabled) {
-                let offsetX, offsetY;
-                let maxAttempts = 10;
-                do {
-                    offsetX = (Math.random() - 0.5) * 250;
-                    offsetY = (Math.random() - 0.5) * 150;
-                    yesButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-                    maxAttempts--;
-                } while (
-                    (isOverlapping(yesButton, noButton) || isOverlapping(yesButton, question)) &&
-                    maxAttempts > 0
-                );
+                let offsetX = (Math.random() - 0.5) * 100; // Смещение ближе к кнопке "Нет"
+                let offsetY = (Math.random() - 0.5) * 50;
+                yesButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
             }
-        }
-
-        function resetYesButton() {
-            yesButton.style.transform = "translate(0, 0)";
-            isYesEnabled = true;
         }
 
         yesButton.addEventListener("mouseover", () => {
             if (!isYesEnabled) {
-                requestAnimationFrame(moveYesButton);
+                moveYesButton();
             }
         });
 
@@ -131,11 +99,14 @@
             }
         });
 
-        setTimeout(resetYesButton, escapeTime);
+        setTimeout(() => {
+            yesButton.style.transform = "translate(0, 0)";
+            isYesEnabled = true;
+        }, 10000);
 
         yesButton.addEventListener("click", (e) => {
             e.stopPropagation();
-            document.body.innerHTML = '<h1>Я тебя тоже</h1><button onclick="location.reload()">Посмотри что было бы нажми ты нет</button>';
+            document.body.innerHTML = '<h1>Я тебя тоже</h1><button onclick="location.reload()">Посмотри что было бы, нажми ты "Нет"</button>';
         });
 
         noButton.addEventListener("click", () => {

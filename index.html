@@ -15,15 +15,6 @@
             height: 100vh;
             font-family: Arial, sans-serif;
         }
-        #cursor {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: red;
-            border-radius: 50%;
-            pointer-events: none;
-            transition: transform 0.1s ease-out;
-        }
         #question {
             font-size: 24px;
             margin-bottom: 20px;
@@ -57,12 +48,6 @@
             height: 100vh;
             object-fit: cover;
         }
-        #back-button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 20px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -72,10 +57,10 @@
         <button id="no">Нет</button>
     </div>
     <div id="video-container">
-<video id="video" controls autoplay preload="auto">
-    <source id="video-source" src="https://raw.githubusercontent.com/asunavextazi/yoyo/main/video/new_sound.mp4" type="video/mp4">
-    Ваш браузер не поддерживает видео.
-</video>
+        <video id="video" controls autoplay preload="auto">
+            <source id="video-source" src="https://raw.githubusercontent.com/asunavextazi/yoyo/main/video/new_sound.mp4" type="video/mp4">
+            Ваш браузер не поддерживает видео.
+        </video>
         <button id="back-button">Назад</button>
     </div>
     <script>
@@ -83,26 +68,44 @@
         const noButton = document.getElementById("no");
         const videoContainer = document.getElementById("video-container");
         const video = document.getElementById("video");
-        const videoSource = document.getElementById("video-source");
         const backButton = document.getElementById("back-button");
         let isYesEnabled = false;
         let escapeTime = 10000;
         let startTime = Date.now();
-        
+
+        function isOverlapping(el1, el2) {
+            const rect1 = el1.getBoundingClientRect();
+            const rect2 = el2.getBoundingClientRect();
+            return !(
+                rect1.right < rect2.left ||
+                rect1.left > rect2.right ||
+                rect1.bottom < rect2.top ||
+                rect1.top > rect2.bottom
+            );
+        }
+
         function moveYesButton() {
             if (!isYesEnabled) {
-                const offsetX = (Math.random() - 0.5) * 400;
-                const offsetY = (Math.random() - 0.5) * 200;
-                yesButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+                let offsetX, offsetY;
+                let maxAttempts = 10;
+                do {
+                    offsetX = (Math.random() - 0.5) * 400;
+                    offsetY = (Math.random() - 0.5) * 200;
+                    yesButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+                    maxAttempts--;
+                } while (
+                    (isOverlapping(yesButton, noButton) || isOverlapping(yesButton, document.getElementById("question"))) &&
+                    maxAttempts > 0
+                );
             }
         }
-        
+
         yesButton.addEventListener("mouseover", () => {
             if (!isYesEnabled) {
-                moveYesButton();
+                requestAnimationFrame(moveYesButton);
             }
         });
-        
+
         const escapeInterval = setInterval(() => {
             if (Date.now() - startTime >= escapeTime) {
                 clearInterval(escapeInterval);
@@ -111,23 +114,16 @@
                 yesButton.style.transform = "translate(0, 0)";
             }
         }, 200);
-        
+
         yesButton.addEventListener("click", () => {
             document.body.innerHTML = '<h1>Я тебя тоже</h1><button onclick="location.reload()">Посмотри что было бы нажми ты нет</button>';
         });
 
-   noButton.addEventListener("click", () => {
-    videoContainer.style.display = "flex";
-    
-    if (video.readyState >= 2) { // Видео уже загружено
-        video.play();
-    } else {
-        video.load();
-        video.play();
-    }
-});
+        noButton.addEventListener("click", () => {
+            videoContainer.style.display = "flex";
+            video.play();
+        });
 
-        
         backButton.addEventListener("click", () => {
             video.pause();
             videoContainer.style.display = "none";
